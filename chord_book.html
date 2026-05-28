@@ -67,7 +67,7 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;}
 
 /* ── A4 SHEET ── */
-.a4{width:100%;max-width:580px;background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 12px rgba(0,0,0,.07);margin-bottom:20px;}
+.a4{width:100%;max-width:780px;background:#fff;border:1px solid var(--border);border-radius:6px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 2px 12px rgba(0,0,0,.07);margin-bottom:20px;}
 
 .key-bar{display:flex;align-items:center;gap:5px;padding:8px 18px;background:#f4f4f2;border-bottom:1px solid var(--border);flex-wrap:wrap;}
 .key-bar-label{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-right:3px;}
@@ -85,22 +85,29 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
 .pills{display:flex;gap:4px;flex-shrink:0;}
 .pill{border-radius:20px;padding:3px 8px;font-size:10px;font-weight:500;font-family:'DM Mono',monospace;background:rgba(255,255,255,.2);color:#fff;white-space:nowrap;}
 
-.body{padding:14px 18px;flex:1;display:flex;flex-direction:column;gap:12px;}
-.two-col{display:grid;grid-template-columns:1fr 1fr;gap:0 20px;}
-.col-div{border-left:0.5px solid #e4e4e4;padding-left:20px;}
+.body{padding:10px 18px;flex:1;display:flex;flex-direction:column;gap:8px;}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;align-items:start;}
+.col-div{border-left:0.5px solid #e4e4e4;padding-left:24px;}
 
-.sec-lbl{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
-.sec-lbl.eng{color:var(--green);}
-.sec-lbl.chn{color:var(--blue);}
+.sec-lbl{display:inline-block;font-size:9px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:8px;padding:2px 8px;border-radius:20px;color:#fff;}
+.sec-lbl.intro-lbl{background:#9CA3AF;}
+.sec-lbl.verse-lbl{background:#3B82F6;}
+.sec-lbl.chorus-lbl{background:#10B981;}
+.sec-lbl.bridge-lbl{background:#F59E0B;}
+.sec-lbl.outro-lbl{background:#9CA3AF;}
+.sec-lbl.pre-lbl{background:#8B5CF6;}
 
-.lrow{margin-bottom:7px;}
-/* bigger chords */
-.ch{font-family:'DM Mono',monospace;font-size:14px;font-weight:500;line-height:1.2;white-space:pre;overflow:hidden;text-overflow:ellipsis;}
-.ch.eng{color:var(--green);}
-.ch.chn{color:var(--blue);}
-.ly{font-size:12px;line-height:1.5;}
-.ly.chn{font-size:13px;letter-spacing:.3px;}
-.chord-only{font-family:'DM Mono',monospace;font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-all;}
+/* ── Inline chord-above-lyric rendering ── */
+.lyric-line{display:flex;flex-wrap:wrap;align-items:flex-end;margin-bottom:6px;line-height:1;}
+.lyric-line.spacer{height:6px;}
+.chord-word{display:inline-flex;flex-direction:column;align-items:flex-start;margin-right:2px;}
+.chord-token{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;line-height:1;padding-bottom:2px;white-space:nowrap;}
+.chord-token.eng{color:var(--green);}
+.chord-token.chn{color:var(--blue);}
+.chord-token.empty{visibility:hidden;}
+.lyric-token{font-size:13px;line-height:1.4;white-space:pre;}
+
+.chord-only{font-family:'DM Mono',monospace;font-size:12px;font-weight:700;line-height:1.8;white-space:pre-wrap;word-break:break-word;}
 .chord-only.eng{color:var(--green);}
 .chord-only.chn{color:var(--blue);}
 
@@ -120,12 +127,14 @@ html,body{height:100%;overflow:hidden;font-family:'DM Sans',sans-serif;backgroun
   .sidebar{position:fixed;left:0;top:0;height:100vh;transform:translateX(-100%);}
   .sidebar.open{transform:translateX(0);}
   .overlay.open{display:block;}
-  .main{padding:12px 8px;}
-  .two-col{grid-template-columns:1fr;}
-  .col-div{border-left:none;padding-left:0;border-top:0.5px solid #e4e4e4;padding-top:10px;margin-top:2px;}
-  .ch{font-size:13px;}
+  .main{padding:12px 6px;}
+  .two-col{grid-template-columns:1fr 1fr;}
+  .col-div{border-left:0.5px solid #e4e4e4;padding-left:12px;}
+  .ch{font-size:11px;}
+  .ly{font-size:11px;}
   .sname-eng{font-size:16px;}
   .sname-chn{font-size:18px;}
+  .body{padding:10px 12px;}
 }
 
 @media print{
@@ -222,7 +231,7 @@ const SONGS=[
        lines:['| C - G - | Am - F - | (x4)  →  C']},
     ],
     note:'Verse 2 same chords · Bridge repeats 2x before final Chorus',
-    layout:'two-col',col1:['intro','verse'],col2:['chorus','bridge'],bottom:['outro']
+
   },
   {
     id:'s2',lang:'chn',
@@ -256,7 +265,7 @@ const SONGS=[
        lines:['| C - G - | Am - F - | (x4)  →  C']},
     ],
     note:'主歌第二遍和弦相同 · 副歌重复 2 次后进桥段 · 最后回副歌结束',
-    layout:'two-col',col1:['intro','verse'],col2:['chorus','bridge'],bottom:['outro']
+
   },
   {
     id:'s3',lang:'eng',
@@ -284,7 +293,7 @@ const SONGS=[
        ]},
     ],
     note:'Verse 2: Age to age He stands · Final chorus can go up 1 key',
-    layout:'two-col',col1:['verse'],col2:['chorus','bridge'],bottom:[]
+
   },
   {
     id:'s4',lang:'chn',
@@ -315,7 +324,7 @@ const SONGS=[
        ]},
     ],
     note:'3/4 拍华尔兹节奏 · 最后一节可升半音',
-    layout:'two-col',col1:['v1','v2'],col2:['chorus'],bottom:[]
+
   },
   {
     id:'s6',lang:'chn',
@@ -358,7 +367,7 @@ const SONGS=[
        ]},
     ],
     note:'副歌重复 2x · 桥段后回副歌结束',
-    layout:'two-col',col1:['intro','verse1','verse2'],col2:['chorus','bridge'],bottom:[]
+
   },
   {
     id:'s7',lang:'chn',
@@ -369,78 +378,77 @@ const SONGS=[
       {id:'verse1',label:'主歌 Verse 1',type:'lyric',
        rows:[
          {ch:'C      G/B    C',ly:'在祢的宝座 前'},
-         {ch:'Am',ly:'天使聚集讚美'},
-         {ch:'Dm     G    C',ly:'荣耀永远属 於祢'},
+         {ch:'Am     G      C',ly:'天使聚集讚美'},
+         {ch:'Dm     G      C',ly:'荣耀永远属 於祢'},
          {ch:'C      G/B    C',ly:'万国万口万 邦'},
-         {ch:'Am',ly:'穿著洁白衣裳'},
-         {ch:'Dm     G    C',ly:'我们前来 向主歌唱'},
+         {ch:'Am     G      C',ly:'穿著洁白衣裳'},
+         {ch:'Dm     G      C',ly:'我们前来 向主歌唱'},
        ]},
       {id:'verse2',label:'主歌 Verse 2',type:'lyric',
        rows:[
          {ch:'C      G/B    C',ly:'在祢的同在 裏'},
-         {ch:'Am',ly:'我们扬声敬拜'},
-         {ch:'Dm     G    C',ly:'爱慕 颂讚不 停息'},
+         {ch:'Am     G      C',ly:'我们扬声敬拜'},
+         {ch:'Dm     G      C',ly:'爱慕 颂讚不 停息'},
          {ch:'C      G/B    C',ly:'昔在今在永 在'},
-         {ch:'Am',ly:'万世尊崇爱戴'},
-         {ch:'Dm     G    C',ly:'為要訴說 祢的爱'},
+         {ch:'Am     G      C',ly:'万世尊崇爱戴'},
+         {ch:'Dm     G      C',ly:'為要訴說 祢的爱'},
        ]},
       {id:'chorus',label:'副歌 Chorus',type:'lyric',
        rows:[
          {ch:'C              C',ly:'我们献上全心的讚 美'},
          {ch:'Am             Am',ly:'归於至高全能大君王'},
          {ch:'Dm             Dm',ly:'我们的声 音 述说祢的荣 耀'},
-         {ch:'G',ly:'祢的慈 爱 直到永 远'},
+         {ch:'Bb             G',ly:'祢的慈 爱 直到永 远'},
          {ch:'C              C',ly:'我们献上 生命的敬 拜'},
          {ch:'Am             Am',ly:'渴慕能够 更多亲近祢'},
          {ch:'Dm             Dm',ly:'蒙恩的儿 女 歌颂祢的美 好'},
-         {ch:'Bb       G',ly:'欢迎祢 的国度 降 临这土地'},
+         {ch:'Bb             G',ly:'欢迎祢 的国度 降 临这土地'},
        ]},
       {id:'bridge',label:'桥段 Bridge',type:'lyric',
        rows:[
          {ch:'C         G/B',ly:'哈利路亚 哈利路亚'},
-         {ch:'Dm              F    G',ly:'哈利路亚 荣耀都归於祢'},
+         {ch:'Dm        F      G',ly:'哈利路亚 荣耀都归於祢'},
        ]},
     ],
     note:'主歌 1 → 主歌 2 → 副歌 → 桥段 → 副歌结束',
-    layout:'two-col',col1:['verse1','verse2'],col2:['chorus','bridge'],bottom:[]
+
   },
   {
     id:'s8',lang:'chn',
     title:'求充满这地',
     titleSub:'Fill This Land',author:'约书亚乐团｜杨家宁词／李宗唐曲',
-    originalKey:'F',bpm:'70',time:'4/4',
+    originalKey:'E',bpm:'70',time:'4/4',
     sections:[
       {id:'verse1',label:'主歌 Verse 1',type:'lyric',
        rows:[
-         {ch:'Gadd2              Bm7        Em7       Bm7',ly:'哦主感谢你，创造这土地，以永恒话语 赐下无限生命，'},
-         {ch:'C              D/C       Bm7  Em7   Am7    C/G',ly:'用恩典的馨香气息祝福这地，让我们全心 跟随你带'},
-         {ch:'F    C/D',ly:'领。'},
+         {ch:'E                  G#m        C#m       G#m',ly:'哦主感谢祢 创造这土地 以永恒话语 赐下无限生命'},
+         {ch:'A              B        G#m  C#m   F#m    A/E',ly:'用恩典的馨香气息 祝福这地 让我们全心 跟随祢带领'},
        ]},
       {id:'verse2',label:'主歌 Verse 2',type:'lyric',
        rows:[
-         {ch:'Gadd2              Bm7        Em7       Bm7',ly:'谢你，创造这土地，以慈爱浇灌，以喜乐耕耘，'},
-         {ch:'C              D/C       Bm7  Em7   Am7    C/G',ly:'用无数的白昼黑夜孕育这地，顺服'},
-         {ch:'Am7   G/B     C        A/C#',ly:'的人情、感恩的心情，现在都只愿 以基督的心'},
-         {ch:'C/D',ly:'为心。'},
+         {ch:'E                  G#m        C#m       G#m',ly:'感谢祢 创造这土地 以慈爱浇灌 以喜乐耕耘'},
+         {ch:'A              B        G#m  C#m   F#m    A/E',ly:'用无数的白昼黑夜 孕育这地 顺服'},
+         {ch:'F#m       G#m      A         Ab/C',ly:'的人情 感恩的心情 现在都只愿 以基督的心为心'},
        ]},
       {id:'chorus',label:'副歌 Chorus',type:'lyric',
        rows:[
-         {ch:'G                    Bm7',ly:'主，求你充满我们，来医治这地，痛苦疾病'},
-         {ch:'Em7                  C',ly:'要过去，神迹在运行。'},
-         {ch:'G                    Bm7',ly:'主，求你充满我们，来转化这地，'},
-         {ch:'Bm7    Em7  G/D   Am7        D',ly:'黑暗权势要离去。主，求你临。'},
-         {ch:'C        Bm7  Em7  G/D   Am7        D',ly:'充满我们，来转化这地，全地尊荣你圣名，为你而站立。'},
+         {ch:'E                    G#m',ly:'主求祢充满我们 来医治这地 痛苦疾病要过去'},
+         {ch:'C#m                  A',ly:'神迹在运行'},
+         {ch:'E                    B       G#m  C#m',ly:'主求祢充满我们 来转化这地 黑暗权势要离去'},
+         {ch:'',ly:''},
+         {ch:'E                    G#m',ly:'主求祢充满我们 来医治这地 全地看见祢荣耀'},
+         {ch:'Bm        E',ly:'祢复兴降临'},
+         {ch:'A                B       G#m  C#m',ly:'主求祢充满我们 来转化这地 全地尊荣祢圣名'},
+         {ch:'F#m       B',ly:'为祢而站立'},
        ]},
       {id:'bridge',label:'桥段 Bridge',type:'lyric',
        rows:[
-         {ch:'G (C)       D/C         Bm7',ly:'一生  祝福 永不停息，祝福'},
-         {ch:'Bm7    Em7    Am7      Dsus4     G    F/G',ly:'永不停息，世代 因你爱延续 呼求 你。一生'},
+         {ch:'A      B    G#m      C#m   F#m    B',ly:'一生祝福 永不停息 世代 因祢爱延续 呼求'},
+         {ch:'E',ly:'祢'},
        ]},
-      {id:'outro',label:'尾奏 Outro',type:'chord-only',
-       lines:['To Chorus → 重复副歌结束']},
     ],
-    note:'原调 F（此谱用 G 编排方便弹奏）· 共3张：E/F/G调 · Bridge后To Chorus',
-    layout:'two-col',col1:['verse1','verse2'],col2:['chorus','bridge'],bottom:['outro']
+    note:'选调 E · 原唱调 A · Bridge 后 To Chorus 重复结束',
+
   },
   {
     id:'s5',lang:'eng',
@@ -470,7 +478,7 @@ const SONGS=[
        ]},
     ],
     note:'Chorus first → Verse → Chorus · Bridge before final Chorus',
-    layout:'two-col',col1:['chorus'],col2:['verse','bridge'],bottom:[]
+
   },
 ];
 
@@ -532,30 +540,132 @@ function renderKeyBar(song){
   return'<span class="key-bar-label">Key</span>'+
     ALL_KEYS.map(x=>`<button class="key-btn ${k===x?sc:''}" onclick="changeKey('${song.id}','${x}')">${x}</button>`).join('');
 }
-function renderSec(sec,song,key,lang){
-  if(sec.type==='chord-only'){
-    return`<div><div class="sec-lbl ${lang}">${sec.label}</div>
-    <div class="chord-only ${lang}">${sec.lines.map(l=>tc(l,song,key)).join('\n')}</div></div>`;
-  }
-  const rows=sec.rows.map(r=>{
-    if(!r.ch&&!r.ly)return'<div style="height:5px"></div>';
-    return`<div class="lrow"><div class="ch ${lang}">${tc(r.ch,song,key)}</div>${r.ly?`<div class="ly ${lang}">${r.ly}</div>`:''}</div>`;
-  }).join('');
-  return`<div><div class="sec-lbl ${lang}">${sec.label}</div>${rows}</div>`;
+function secPillClass(id){
+  if(/intro/i.test(id))return'intro-lbl';
+  if(/verse|主歌/i.test(id))return'verse-lbl';
+  if(/chorus|副歌/i.test(id))return'chorus-lbl';
+  if(/bridge|桥段/i.test(id))return'bridge-lbl';
+  if(/outro|尾奏/i.test(id))return'outro-lbl';
+  if(/pre/i.test(id))return'pre-lbl';
+  return'intro-lbl';
 }
+// ── Inline chord+lyric renderer ───────────────────────────
+// Each row = one "lyric line" with chords floating above the syllables.
+// Strategy: pair chord tokens (split by spaces) with lyric segments,
+// rendering each as a vertical stack [chord / lyric] side by side.
+function renderLyricLine(chRaw, lyRaw, lang, song, key){
+  const ch = tc(chRaw, song, key).trim();
+  const ly = lyRaw || '';
+
+  // If no chord at all, just show the lyric
+  if(!ch){
+    return`<div class="lyric-line"><span class="lyric-token">${ly}</span></div>`;
+  }
+
+  // Split chord string into tokens (chords + spaces between)
+  // e.g. "C      G/B    C" → ['C','G/B','C'] with spacing info
+  const chTokens = ch.split(/\s+/).filter(Boolean);
+
+  // If no lyric, show chord tokens only (no lyric row)
+  if(!ly){
+    const spans = chTokens.map(t=>
+      `<span class="chord-word"><span class="chord-token ${lang}">${t}</span><span class="lyric-token"> </span></span>`
+    ).join('<span style="display:inline-flex;flex-direction:column"><span class="chord-token empty">.</span><span class="lyric-token"> </span></span>');
+    return`<div class="lyric-line">${chTokens.map(t=>
+      `<span class="chord-word"><span class="chord-token ${lang}">${t}</span><span class="lyric-token">&nbsp;&nbsp;</span></span>`
+    ).join('')}</div>`;
+  }
+
+  // Pair each chord token with a lyric segment.
+  // We split the lyric at spaces that roughly align with chord boundaries.
+  // Simple approach: distribute lyric characters across chord slots.
+  // Split lyric by spaces to get words, then distribute.
+  const lyWords = ly.split(' ');
+
+  if(chTokens.length === 1){
+    // Single chord: put it above the whole lyric
+    return`<div class="lyric-line">
+      <span class="chord-word">
+        <span class="chord-token ${lang}">${chTokens[0]}</span>
+        <span class="lyric-token">${ly}</span>
+      </span>
+    </div>`;
+  }
+
+  // Multiple chords: distribute lyric words across chord tokens
+  // Each chord gets at least one word; remainder goes to last chord
+  const slots = chTokens.map((t,i) => ({chord:t, words:[]}));
+  lyWords.forEach((w,i) => {
+    const slot = Math.min(i, slots.length-1);
+    slots[slot].words.push(w);
+  });
+
+  const html = slots.map(s =>
+    `<span class="chord-word">
+      <span class="chord-token ${lang}">${s.chord}</span>
+      <span class="lyric-token">${s.words.join(' ')}${s.words.length?'&nbsp;':''}</span>
+    </span>`
+  ).join('');
+
+  return`<div class="lyric-line">${html}</div>`;
+}
+
+function renderSec(sec, song, key, lang){
+  const pill = `<span class="sec-lbl ${secPillClass(sec.id)}">${sec.label}</span>`;
+
+  if(sec.type === 'chord-only'){
+    return`<div style="margin-bottom:10px">${pill}
+      <div class="chord-only ${lang}">${sec.lines.map(l=>tc(l,song,key)).join('\n')}</div>
+    </div>`;
+  }
+
+  const lines = sec.rows.map(r => {
+    if(!r.ch && !r.ly) return `<div class="lyric-line spacer"></div>`;
+    return renderLyricLine(r.ch, r.ly, lang, song, key);
+  }).join('');
+
+  return`<div style="margin-bottom:10px">${pill}${lines}</div>`;
+}
+// ── Auto-flow two-column layout ────────────────────────────
+// Estimates section height in "units" (each lyric row ≈ 1 unit, chord-only line ≈ 0.8)
+function estimateHeight(sec){
+  const PILL=1.5, GAP=1.0;
+  if(sec.type==='chord-only') return PILL + sec.lines.length*1.2 + GAP;
+  const rows=sec.rows.filter(r=>r.ch||r.ly).length;
+  const blanks=sec.rows.length-rows;
+  return PILL + rows*2.0 + blanks*0.5 + GAP;
+}
+function autoFlowCols(sections){
+  const heights=sections.map(estimateHeight);
+  const total=heights.reduce((a,b)=>a+b,0);
+  const target=total/2;
+  let col1=[],col2=[],sum=0,split=false;
+  for(let i=0;i<sections.length;i++){
+    if(!split && col1.length>0){
+      // Switch to col2 if adding this section brings us to or past target
+      if(sum+heights[i]>=target){
+        // Check: is it closer to switch now or after?
+        const diffNow=Math.abs(sum-target);
+        const diffAfter=Math.abs(sum+heights[i]-target);
+        if(diffNow<=diffAfter){split=true;}
+      }
+    }
+    split?col2.push(sections[i]):col1.push(sections[i]);
+    if(!split)sum+=heights[i];
+  }
+  if(col2.length===0&&col1.length>1){col2.push(col1.pop());}
+  return{col1,col2};
+}
+
 function buildSheet(song){
   const lang=song.lang,key=currentKey[song.id];
   const hdrCls=lang==='eng'?'hdr-eng':'hdr-chn';
   const nameCls=lang==='eng'?'sname-eng':'sname-chn';
-  const secMap={};song.sections.forEach(s=>secMap[s.id]=s);
 
-  let bodyHTML='';
-  if(song.layout==='two-col'){
-    const c1=song.col1.map(id=>renderSec(secMap[id],song,key,lang)).join('<div style="height:12px"></div>');
-    const c2=song.col2.map(id=>renderSec(secMap[id],song,key,lang)).join('<div style="height:12px"></div>');
-    const bot=song.bottom.map(id=>renderSec(secMap[id],song,key,lang)).join('');
-    bodyHTML=`<div class="two-col"><div>${c1}</div><div class="col-div">${c2}</div></div>${bot?`<div style="margin-top:10px">${bot}</div>`:''}`;
-  }
+  // Auto-flow: distribute sections into two columns, never splitting a section
+  const {col1,col2}=autoFlowCols(song.sections);
+  const renderCol=secs=>secs.map(s=>renderSec(s,song,key,lang)).join('<div style="height:10px"></div>');
+  const bodyHTML=`<div class="two-col"><div>${renderCol(col1)}</div><div class="col-div">${renderCol(col2)}</div></div>`;
 
   return`<div class="a4">
     <div class="key-bar">${renderKeyBar(song)}</div>
