@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的歌谱本 Chord Book</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+:root {
+  --green: #0F6E56; --green-light: #E1F5EE; --green-mid: #1D9E75;
+  --blue: #185FA5;  --blue-light: #E6F1FB;  --blue-mid: #378ADD;
+  --gray-bg: #F7F7F5; --border: #E8E8E4; --text: #1a1a1a; --muted: #888;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'DM Sans', sans-serif; background: var(--gray-bg); color: var(--text); }
+
+/* ── LAYOUT ── */
+.app { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar {
+  width: 280px; min-width: 280px; background: #fff;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; height: 100vh;
+}
+.sidebar-header {
+  padding: 20px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.app-title { font-size: 17px; font-weight: 600; color: var(--text); }
+.app-sub   { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+.search-wrap { padding: 12px 16px; border-bottom: 1px solid var(--border); }
+.search-box {
+  width: 100%; padding: 8px 12px 8px 34px;
+  border: 1px solid var(--border); border-radius: 8px;
+  font-size: 13px; font-family: inherit; background: var(--gray-bg);
+  outline: none; color: var(--text);
+}
+.search-box:focus { border-color: var(--green-mid); background: #fff; }
+.search-wrap { position: relative; }
+.search-icon {
+  position: absolute; left: 26px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px; color: var(--muted); pointer-events: none;
+}
+
+.filter-row {
+  display: flex; gap: 6px; padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.filter-btn {
+  padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+  cursor: pointer; border: 1px solid var(--border);
+  background: #fff; color: var(--muted); font-family: inherit;
+  transition: all .12s;
+}
+.filter-btn.active-all  { background: var(--text); border-color: var(--text); color: #fff; }
+.filter-btn.active-eng  { background: var(--green); border-color: var(--green); color: #fff; }
+.filter-btn.active-chn  { background: var(--blue);  border-color: var(--blue);  color: #fff; }
+
+.song-list { flex: 1; overflow-y: auto; padding: 8px 0; }
+.song-item {
+  padding: 10px 20px; cursor: pointer; transition: background .1s;
+  border-left: 3px solid transparent;
+}
+.song-item:hover { background: var(--gray-bg); }
+.song-item.active-eng { background: var(--green-light); border-left-color: var(--green); }
+.song-item.active-chn { background: var(--blue-light);  border-left-color: var(--blue); }
+.song-title-text { font-size: 14px; font-weight: 500; }
+.song-meta-row { display: flex; gap: 6px; align-items: center; margin-top: 3px; }
+.lang-tag {
+  font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 4px;
+  letter-spacing: .5px;
+}
+.lang-tag.eng { background: var(--green-light); color: var(--green); }
+.lang-tag.chn { background: var(--blue-light);  color: var(--blue); }
+.song-key-tag { font-size: 11px; color: var(--muted); font-family: 'DM Mono', monospace; }
+.no-results { padding: 24px 20px; font-size: 13px; color: var(--muted); text-align: center; }
+
+/* ── MAIN ── */
+.main { flex: 1; overflow-y: auto; padding: 28px; display: flex; justify-content: center; }
+.welcome {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  height: 100%; color: var(--muted); text-align: center; gap: 12px;
+}
+.welcome-icon { font-size: 48px; }
+.welcome-text { font-size: 15px; }
+
+/* ── A4 SHEET ── */
+.a4 {
+  width: 595px; background: #fff;
+  border: 1px solid var(--border); border-radius: 6px;
+  overflow: hidden; display: flex; flex-direction: column;
+  box-shadow: 0 2px 16px rgba(0,0,0,.07);
+}
+
+.key-bar {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 24px; background: #f4f4f2;
+  border-bottom: 1px solid var(--border); flex-wrap: wrap;
+}
+.key-bar-label {
+  font-size: 10px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted); margin-right: 4px;
+}
+.key-btn {
+  padding: 3px 10px; border-radius: 5px; font-size: 12px; font-weight: 500;
+  cursor: pointer; border: 1px solid #ddd; background: #fff; color: #555;
+  font-family: 'DM Mono', monospace; transition: all .1s;
+}
+.key-btn:hover { border-color: #999; }
+.key-btn.sel-eng { background: var(--green); border-color: var(--green); color: #fff; }
+.key-btn.sel-chn { background: var(--blue);  border-color: var(--blue);  color: #fff; }
+
+.hdr-eng { background: var(--green); padding: 16px 24px; }
+.hdr-chn { background: var(--blue);  padding: 16px 24px; }
+.hdr-inner { display: flex; align-items: flex-start; justify-content: space-between; }
+.song-name-eng { font-size: 20px; font-weight: 600; color: #fff; }
+.song-name-chn { font-size: 22px; font-weight: 600; color: #fff; letter-spacing: .8px; }
+.song-name-sub  { font-size: 12px; color: rgba(255,255,255,.65); margin-top: 3px; }
+.pills { display: flex; gap: 5px; flex-shrink: 0; margin-left: 12px; }
+.pill {
+  border-radius: 20px; padding: 3px 10px; font-size: 11px;
+  font-weight: 500; font-family: 'DM Mono', monospace;
+  background: rgba(255,255,255,.2); color: #fff; white-space: nowrap;
+}
+
+.body { padding: 18px 24px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+.col-div { border-left: 0.5px solid #e4e4e4; padding-left: 24px; }
+
+.sec-lbl { font-size: 9px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 7px; }
+.sec-lbl.eng { color: var(--green); }
+.sec-lbl.chn { color: var(--blue); }
+
+.lrow { margin-bottom: 8px; }
+.ch {
+  font-family: 'DM Mono', monospace; font-size: 15px;
+  font-weight: 500; line-height: 1.2; white-space: pre;
+}
+.ch.eng { color: var(--green); }
+.ch.chn { color: var(--blue); }
+.ly     { font-size: 13px; line-height: 1.5; }
+.ly.chn { font-size: 14px; letter-spacing: .3px; }
+.chord-only { font-family: 'DM Mono', monospace; font-size: 15px; line-height: 1.8; white-space: pre-wrap; }
+.chord-only.eng { color: var(--green); }
+.chord-only.chn { color: var(--blue); }
+
+.note-box {
+  padding: 7px 12px; border-radius: 0 5px 5px 0;
+  font-size: 11.5px; color: #444;
+}
+.note-box.eng { background: #f7faf9; border-left: 3px solid var(--green-mid); }
+.note-box.chn { background: #f0f6fd; border-left: 3px solid var(--blue-mid); }
+
+.ftr {
+  border-top: 1px solid var(--border); padding: 8px 24px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.key-badge {
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  border-radius: 5px; padding: 3px 10px; font-weight: 500;
+}
+.key-badge.eng { background: var(--green-light); color: var(--green); }
+.key-badge.chn { background: var(--blue-light);  color: var(--blue); }
+.finfo { font-size: 11px; color: #bbb; }
+
+/* print */
+@media print {
+  .sidebar { display: none; }
+  .main { padding: 0; }
+  .a4 { box-shadow: none; border: none; width: 100%; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="app-title">🎵 我的歌谱本</div>
+      <div class="app-sub">Chord Book · 离线使用</div>
+    </div>
+
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-box" id="searchInput" type="text"
+        placeholder="搜索歌名 / Search song..." oninput="filterSongs()">
+    </div>
+
+    <div class="filter-row">
+      <button class="filter-btn active-all" id="f-all" onclick="setFilter('all')">All</button>
+      <button class="filter-btn" id="f-eng" onclick="setFilter('eng')">English</button>
+      <button class="filter-btn" id="f-chn" onclick="setFilter('chn')">中文</button>
+    </div>
+
+    <div class="song-list" id="songList"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main" id="main">
+    <div class="welcome">
+      <div class="welcome-icon">🎹</div>
+      <div class="welcome-text">从左边选一首歌开始<br>Select a song from the list</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Transpose engine ──────────────────────────────────────
+const SHARPS=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+const FLATS =['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+const FLAT_KEYS=['F','Bb','Eb','Ab','Db','Gb'];
+function noteIdx(n){let i=SHARPS.indexOf(n);if(i>=0)return i;return FLATS.indexOf(n);}
+function transposeNote(n,s,flat){
+  const i=noteIdx(n); if(i<0)return n;
+  const ni=((i+s)%12+12)%12;
+  return flat?FLATS[ni]:SHARPS[ni];
+}
+function transposeLine(line,s,flat){
+  if(s===0)return line;
+  return line.replace(/[A-G][#b]?/g,(m,off,str)=>{
+    const before=str[off-1];
+    if(before&&/[a-z]/.test(before))return m;
+    return transposeNote(m,s,flat);
+  });
+}
+const ALL_KEYS=['C','Db','D','Eb','E','F','Gb','G','Ab','A','Bb','B'];
+
+// ── Song database ─────────────────────────────────────────
+const SONGS = [
+  {
+    id:'s1', lang:'eng',
+    title:'This Is the Air I Breathe',
+    titleSub:'', author:'Michael W. Smith',
+    originalKey:'C', bpm:'70', time:'4/4',
+    sections:[
+      {id:'intro', label:'Intro', type:'chord-only',
+       lines:['| C - - G | - - - - | D - Em | - - - - |','| C - - G | - - - - | D - G  | - - - - |']},
+      {id:'verse', label:'Verse 1', type:'lyric',
+       rows:[
+         {ch:'C              F',            ly:'This is the air I breathe'},
+         {ch:'C              F',            ly:'This is the air I breathe'},
+         {ch:'C    G   Am   F   Am  G',     ly:'Your holy presence living in me'},
+         {ch:'',ly:''},
+         {ch:'C              F',            ly:'This is my daily bread'},
+         {ch:'C              F',            ly:'This is my daily bread'},
+         {ch:'C    G   Am   F   Am  G',     ly:'Your very word spoken to me'},
+       ]},
+      {id:'chorus', label:'Chorus', type:'lyric',
+       rows:[
+         {ch:'C    G   Am    G',            ly:'And I'},
+         {ch:'             F      Am  G',   ly:"I'm desperate for you"},
+         {ch:'C    G   Am    G',            ly:'And I'},
+         {ch:'             F            G', ly:"I'm lost without you"},
+       ]},
+      {id:'bridge', label:'Bridge', type:'lyric',
+       rows:[
+         {ch:'Am   G   F    C',             ly:"And I, I'm desperate for you"},
+         {ch:'Am   G   F         G',        ly:"I'm lost without you, Lord"},
+       ]},
+      {id:'outro', label:'Outro', type:'chord-only',
+       lines:['| C - G - | Am - F - | (x4)   →   C']},
+    ],
+    note:'Verse 2 same chords · Bridge repeats 2x before final Chorus',
+    layout:'two-col', col1:['intro','verse'], col2:['chorus','bridge'], bottom:['outro']
+  },
+  {
+    id:'s2', lang:'chn',
+    title:'祢是我的气息',
+    titleSub:'This Is the Air I Breathe', author:'Michael W. Smith｜华语版',
+    originalKey:'C', bpm:'70', time:'4/4',
+    sections:[
+      {id:'intro', label:'Intro', type:'chord-only',
+       lines:['| C - - G | - - - - | D - Em | - - - - |','| C - - G | - - - - | D - G  | - - - - |']},
+      {id:'verse', label:'主歌 Verse 1', type:'lyric',
+       rows:[
+         {ch:'C              F',            ly:'祢是我的气息  祢是我的气息'},
+         {ch:'C    G   Am   F   Am  G',     ly:'祢圣洁同在  进入我心'},
+         {ch:'',ly:''},
+         {ch:'C              F',            ly:'祢是我全所有  祢是我全所有'},
+         {ch:'C    G   Am   F   Am  G',     ly:'祢真理话语  向我诉说'},
+       ]},
+      {id:'chorus', label:'副歌 Chorus', type:'lyric',
+       rows:[
+         {ch:'C    G   Am    G',            ly:'而我  多么需要祢'},
+         {ch:'C    G   F     Am  G',        ly:'而我  不能失去祢'},
+         {ch:'',ly:''},
+         {ch:'Am   G   F    C',             ly:'多么需要祢  多么需要祢'},
+       ]},
+      {id:'bridge', label:'桥段 Bridge', type:'lyric',
+       rows:[
+         {ch:'F    G   Am   C',             ly:'主啊我多需要祢'},
+         {ch:'F    G        C',             ly:'祢是我唯一盼望'},
+       ]},
+      {id:'outro', label:'尾奏 Outro', type:'chord-only',
+       lines:['| C - G - | Am - F - | (x4)   →   C']},
+    ],
+    note:'主歌第二遍和弦相同 · 副歌重复 2 次后进桥段 · 最后回副歌结束',
+    layout:'two-col', col1:['intro','verse'], col2:['chorus','bridge'], bottom:['outro']
+  },
+  {
+    id:'s3', lang:'eng',
+    title:'How Great Is Our God',
+    titleSub:'', author:'Chris Tomlin',
+    originalKey:'G', bpm:'76', time:'4/4',
+    sections:[
+      {id:'verse', label:'Verse 1', type:'lyric',
+       rows:[
+         {ch:'G                        Em',  ly:'The splendor of the King, clothed in majesty'},
+         {ch:'C                        D',   ly:'Let all the earth rejoice, all the earth rejoice'},
+         {ch:'G                        Em',  ly:'He wraps Himself in light, and darkness tries to hide'},
+         {ch:'C                        D',   ly:'It trembles at His voice, it trembles at His voice'},
+       ]},
+      {id:'chorus', label:'Chorus', type:'lyric',
+       rows:[
+         {ch:'G',                            ly:'How great is our God'},
+         {ch:'         Em',                  ly:'Sing with me how great is our God'},
+         {ch:'C                   D',        ly:'And all will see how great, how great is our God'},
+       ]},
+      {id:'bridge', label:'Bridge', type:'lyric',
+       rows:[
+         {ch:'G   Em  C   D',                ly:'Name above all names, worthy of all praise'},
+         {ch:'G   Em  C   D',                ly:'My heart will sing how great is our God'},
+       ]},
+    ],
+    note:'Verse 2: Age to age He stands · Chorus key can go up 1 step for final repeat',
+    layout:'two-col', col1:['verse'], col2:['chorus','bridge'], bottom:[]
+  },
+  {
+    id:'s4', lang:'chn',
+    title:'奇异恩典',
+    titleSub:'Amazing Grace', author:'John Newton｜传统圣诗',
+    originalKey:'G', bpm:'72', time:'3/4',
+    sections:[
+      {id:'v1', label:'第一节 Verse 1', type:'lyric',
+       rows:[
+         {ch:'G         G7   C',     ly:'奇异恩典 何等甘甜'},
+         {ch:'G         D',          ly:'我罪已得赦免'},
+         {ch:'G         G7   C',     ly:'前我失丧 今被寻回'},
+         {ch:'G    D7   G',          ly:'瞎眼今得看见'},
+       ]},
+      {id:'v2', label:'第二节 Verse 2', type:'lyric',
+       rows:[
+         {ch:'G         G7   C',     ly:'如此恩典 使我敬畏'},
+         {ch:'G         D',          ly:'使我心得安慰'},
+         {ch:'G         G7   C',     ly:'初信之时 即蒙恩惠'},
+         {ch:'G    D7   G',          ly:'真是何等宝贵'},
+       ]},
+      {id:'chorus', label:'副歌 Chorus', type:'lyric',
+       rows:[
+         {ch:'C         G',          ly:'奇异奇异 真奇异'},
+         {ch:'G    D',               ly:'救恩真奇异'},
+         {ch:'G         G7   C',     ly:'我今虽死 犹得颂扬'},
+         {ch:'G    D7   G',          ly:'直到永永远远'},
+       ]},
+    ],
+    note:'3/4 拍华尔兹节奏 · 最后一节可升半音增强效果',
+    layout:'two-col', col1:['v1','v2'], col2:['chorus'], bottom:[]
+  },
+  {
+    id:'s5', lang:'eng',
+    title:'10,000 Reasons (Bless the Lord)',
+    titleSub:'', author:'Matt Redman',
+    originalKey:'G', bpm:'73', time:'4/4',
+    sections:[
+      {id:'chorus', label:'Chorus', type:'lyric',
+       rows:[
+         {ch:'G           D',        ly:'Bless the Lord O my soul'},
+         {ch:'Em          C',        ly:'O my soul, worship His holy name'},
+         {ch:'G    D      Em  C',    ly:'Sing like never before, O my soul'},
+         {ch:'G    D      G',        ly:'I worship Your holy name'},
+       ]},
+      {id:'verse', label:'Verse 1', type:'lyric',
+       rows:[
+         {ch:'G              D',     ly:'The sun comes up, it\'s a new day dawning'},
+         {ch:'Em             C',     ly:'It\'s time to sing Your song again'},
+         {ch:'G              D',     ly:'Whatever may pass and whatever lies before me'},
+         {ch:'Em    C        D',     ly:'Let me be singing when the evening comes'},
+       ]},
+      {id:'bridge', label:'Bridge', type:'lyric',
+       rows:[
+         {ch:'G   D   Em  C',        ly:'And on that day when my strength is failing'},
+         {ch:'G   D   Em  C',        ly:'The end draws near and my time has come'},
+         {ch:'G       D',            ly:'Still my soul will sing Your praise unending'},
+         {ch:'Em  C   D',            ly:'Ten thousand years and then forevermore'},
+       ]},
+    ],
+    note:'Chorus first, then Verse · Bridge before final Chorus',
+    layout:'two-col', col1:['chorus'], col2:['verse','bridge'], bottom:[]
+  },
+];
+
+// ── State ─────────────────────────────────────────────────
+let currentSong = null;
+let currentKey  = {};
+let activeFilter = 'all';
+SONGS.forEach(s=>{ currentKey[s.id]=s.originalKey; });
+
+// ── Sidebar ───────────────────────────────────────────────
+function setFilter(f){
+  activeFilter=f;
+  ['all','eng','chn'].forEach(x=>{
+    const btn=document.getElementById('f-'+x);
+    btn.className='filter-btn'+(x===f?' active-'+f:'');
+  });
+  filterSongs();
+}
+
+function filterSongs(){
+  const q=document.getElementById('searchInput').value.toLowerCase();
+  const list=document.getElementById('songList');
+  let html=''; let count=0;
+  SONGS.forEach(s=>{
+    if(activeFilter!=='all'&&s.lang!==activeFilter)return;
+    if(q&&!s.title.toLowerCase().includes(q)&&!s.titleSub.toLowerCase().includes(q))return;
+    const ac=currentSong===s.id?(s.lang==='eng'?'active-eng':'active-chn'):'';
+    html+=`<div class="song-item ${ac}" onclick="openSong('${s.id}')">
+      <div class="song-title-text">${s.title}</div>
+      <div class="song-meta-row">
+        <span class="lang-tag ${s.lang}">${s.lang==='eng'?'ENG':'中文'}</span>
+        <span class="song-key-tag">Key ${currentKey[s.id]} · ${s.bpm}bpm</span>
+      </div>
+    </div>`;
+    count++;
+  });
+  if(count===0) html='<div class="no-results">没有找到歌曲<br>No songs found</div>';
+  list.innerHTML=html;
+}
+
+// ── Sheet rendering ───────────────────────────────────────
+function getSemis(song,key){
+  const oi=noteIdx(song.originalKey), ni=noteIdx(key);
+  return((ni-oi)+12)%12;
+}
+function tc(line,song,key){
+  return transposeLine(line,getSemis(song,key),FLAT_KEYS.includes(key));
+}
+
+function renderKeyBar(song){
+  const lang=song.lang; const key=currentKey[song.id];
+  const selCls=lang==='eng'?'sel-eng':'sel-chn';
+  return '<span class="key-bar-label">Key</span>'+
+    ALL_KEYS.map(k=>`<button class="key-btn ${key===k?selCls:''}" onclick="changeKey('${song.id}','${k}')">${k}</button>`).join('');
+}
+
+function renderSection(sec,song,key,lang){
+  if(sec.type==='chord-only'){
+    return `<div><div class="sec-lbl ${lang}">${sec.label}</div>
+    <div class="chord-only ${lang}">${sec.lines.map(l=>tc(l,song,key)).join('\n')}</div></div>`;
+  }
+  const rows=sec.rows.map(r=>{
+    if(!r.ch&&!r.ly)return'<div style="height:6px"></div>';
+    return`<div class="lrow">
+      <div class="ch ${lang}">${tc(r.ch,song,key)}</div>
+      ${r.ly?`<div class="ly ${lang}">${r.ly}</div>`:''}
+    </div>`;
+  }).join('');
+  return`<div><div class="sec-lbl ${lang}">${sec.label}</div>${rows}</div>`;
+}
+
+function buildSheet(song){
+  const lang=song.lang; const key=currentKey[song.id];
+  const hdrCls=lang==='eng'?'hdr-eng':'hdr-chn';
+  const nameCls=lang==='eng'?'song-name-eng':'song-name-chn';
+
+  // header
+  let hdr=`<div class="${hdrCls}"><div class="hdr-inner">
+    <div>
+      <div class="${nameCls}">${song.title}</div>
+      ${song.titleSub?`<div class="song-name-sub">${song.titleSub}</div>`:''}
+    </div>
+    <div class="pills">
+      <span class="pill">${key}</span>
+      <span class="pill">${song.bpm} bpm</span>
+      <span class="pill">${song.time}</span>
+    </div>
+  </div></div>`;
+
+  // sections by layout
+  const sectionMap={};
+  song.sections.forEach(s=>sectionMap[s.id]=s);
+
+  let bodyHTML='';
+  if(song.layout==='two-col'){
+    const col1=song.col1.map(id=>renderSection(sectionMap[id],song,key,lang)).join('<div style="height:14px"></div>');
+    const col2=song.col2.map(id=>renderSection(sectionMap[id],song,key,lang)).join('<div style="height:14px"></div>');
+    const bottom=song.bottom.map(id=>renderSection(sectionMap[id],song,key,lang)).join('');
+    bodyHTML=`<div class="two-col"><div>${col1}</div><div class="col-div">${col2}</div></div>${bottom?`<div style="margin-top:4px">${bottom}</div>`:''}`;
+  } else {
+    bodyHTML=song.sections.map(s=>renderSection(s,song,key,lang)).join('<div style="height:14px"></div>');
+  }
+
+  return`<div class="a4">
+    <div class="key-bar" id="kb-${song.id}">${renderKeyBar(song)}</div>
+    ${hdr}
+    <div class="body">
+      ${bodyHTML}
+      ${song.note?`<div class="note-box ${lang}">💡 ${song.note}</div>`:''}
+    </div>
+    <div class="ftr">
+      <span class="key-badge ${lang}" id="kbd-${song.id}">Key: ${key}</span>
+      <span class="finfo">${song.author}</span>
+    </div>
+  </div>`;
+}
+
+function openSong(id){
+  currentSong=id;
+  const song=SONGS.find(s=>s.id===id);
+  document.getElementById('main').innerHTML=buildSheet(song);
+  filterSongs();
+}
+
+function changeKey(id,key){
+  currentKey[id]=key;
+  const song=SONGS.find(s=>s.id===id);
+  document.getElementById('main').innerHTML=buildSheet(song);
+  filterSongs();
+}
+
+// init
+filterSongs();
+</script>
+</body>
+</html>
